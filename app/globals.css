@@ -1,0 +1,318 @@
+/* ScOp Portfolio Meeting App — Design System */
+/* Extracted from scopvc.com inspection */
+
+:root {
+  /* Core palette */
+  --black: #000000;
+  --surface-1: #0a0a0a;
+  --surface-2: #131313;
+  --surface-3: #1a1a1a;
+  --cream: #F3F0E7;
+  --cream-80: rgba(243, 240, 231, 0.8);
+  --cream-60: rgba(243, 240, 231, 0.6);
+  --cream-40: rgba(243, 240, 231, 0.4);
+  --cream-20: rgba(243, 240, 231, 0.2);
+  --cream-12: rgba(243, 240, 231, 0.12);
+  --cream-08: rgba(243, 240, 231, 0.08);
+  --cream-04: rgba(243, 240, 231, 0.04);
+  --muted: rgb(104, 109, 109);
+  --green: #6fcf6f;
+  --amber: #e0ad3a;
+  --red: #e06060;
+
+  /* Shadows (dark-mode depth) */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--black);
+  color: var(--cream);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cream-12);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cream-20);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Textarea */
+textarea {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  background: var(--surface-2);
+  border: 1px solid var(--cream-08);
+  border-radius: 0;
+  padding: 12px 14px;
+  width: 100%;
+  resize: vertical;
+  outline: none;
+  transition: border-color 150ms ease;
+  line-height: 1.6;
+}
+textarea:focus {
+  border-color: var(--cream-20);
+}
+textarea::placeholder {
+  color: var(--cream-20);
+}
+
+/* Input */
+input[type="text"],
+input[type="password"] {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--cream);
+  background: var(--surface-2);
+  border: 1px solid var(--cream-12);
+  border-radius: 0;
+  padding: 10px 12px;
+  width: 100%;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: var(--cream-20);
+}
+input::placeholder {
+  color: var(--cream-20);
+}
+
+/* Select */
+select {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--cream);
+  background: var(--surface-2);
+  border: 1px solid var(--cream-12);
+  border-radius: 0;
+  padding: 10px 12px;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23686d6d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+/* Buttons */
+.btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  transition: all 150ms ease;
+  border-radius: 0;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: var(--cream);
+  color: var(--black);
+}
+.btn-primary:hover {
+  background: #ffffff;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--cream-60);
+  border: 1px solid var(--cream-12);
+}
+.btn-ghost:hover {
+  background: var(--cream-04);
+  color: var(--cream-80);
+}
+
+.btn-success {
+  background: var(--green);
+  color: var(--black);
+}
+
+.btn-new-week {
+  background: rgba(111, 207, 111, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(111, 207, 111, 0.2);
+}
+.btn-new-week:hover {
+  background: rgba(111, 207, 111, 0.22);
+}
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--surface-3);
+  border: 1px solid var(--cream-12);
+  box-shadow: var(--shadow-md);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--cream-80);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 300ms ease forwards;
+  max-width: 360px;
+}
+.toast.toast-exit {
+  animation: toastOut 200ms ease forwards;
+}
+.toast-success {
+  border-left: 3px solid var(--green);
+}
+.toast-error {
+  border-left: 3px solid var(--red);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(12px); }
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 150ms ease;
+}
+.modal {
+  background: var(--surface-2);
+  border: 1px solid var(--cream-08);
+  box-shadow: var(--shadow-lg);
+  width: 400px;
+  max-width: 90vw;
+  padding: 24px;
+  animation: modalIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Section label (uppercase) */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cream-40);
+}
+
+/* Status dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.green {
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(111, 207, 111, 0.5);
+}
+.status-dot.amber {
+  background: var(--amber);
+}
+.status-dot.red {
+  background: var(--red);
+  opacity: 0.6;
+}
+
+/* Progress bar */
+.progress-bar-track {
+  height: 3px;
+  background: var(--cream-08);
+  flex: 1;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--cream-40);
+  transition: width 300ms ease;
+}
+
+/* Slide down animation for action items banner */
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 600px; }
+}
+.slide-down {
+  animation: slideDown 400ms ease forwards;
+  overflow: hidden;
+}
