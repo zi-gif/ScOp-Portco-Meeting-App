@@ -3,11 +3,15 @@ import { fetchSheetData } from '@/lib/sheets';
 
 export async function GET() {
   // Quick env check
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
   const envCheck = {
     hasEmail: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    hasKey: !!process.env.GOOGLE_PRIVATE_KEY,
+    hasKey: !!rawKey,
     hasSheetId: !!process.env.GOOGLE_SHEET_ID,
     sheetId: process.env.GOOGLE_SHEET_ID || '(not set)',
+    keyStartsWith: rawKey.substring(0, 30),
+    keyLength: rawKey.length,
+    hasBeginMarker: rawKey.includes('BEGIN PRIVATE KEY'),
   };
 
   try {
