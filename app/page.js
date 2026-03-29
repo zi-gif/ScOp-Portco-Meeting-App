@@ -5,10 +5,14 @@ import {
   Search, Plus, User, Users, Clock, ChevronRight, ChevronDown,
   Save, Loader2, Check, X, Copy, CalendarPlus, AlertCircle,
 } from 'lucide-react';
+<<<<<<< HEAD
 import {
   MOCK_COMPANIES, MOCK_DATES, MOCK_NOTES, MOCK_GENERAL_NOTES,
   MOCK_ACTION_ITEMS, TEAM_MEMBERS, LOGO_MAP,
 } from '@/lib/mockData';
+=======
+import { TEAM_MEMBERS, LOGO_MAP } from '@/lib/mockData';
+>>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
 import { parseActionItems, groupActionsByOwner, formatForSlack } from '@/lib/actionParser';
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -247,6 +251,7 @@ export default function MeetingPage() {
   const [toasts, setToasts] = useState([]);
   const noteRef = useRef(null);
 
+<<<<<<< HEAD
   // Load mock data on mount
   useEffect(() => {
     // Simulate API load
@@ -265,6 +270,81 @@ export default function MeetingPage() {
       });
     }, 400);
     return () => clearTimeout(timer);
+=======
+  // Load live data from Google Sheets on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const res = await fetch('/api/sheet');
+        if (!res.ok) throw new Error('Failed to fetch sheet data');
+        const data = await res.json();
+
+        let { companies, dates, notes, generalNotes, actionItems } = data;
+
+        // Auto-generate new Wednesday if needed
+        if (dates.length > 0) {
+          const lastDate = dates[dates.length - 1];
+          const nextWed = getNextWednesday(lastDate);
+          const now = new Date();
+          const parts = nextWed.split('/');
+          const nextWedDate = new Date(now.getFullYear(), parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
+          // If today is on or after that Wednesday and it doesn't exist yet
+          if (now >= nextWedDate && !dates.includes(nextWed)) {
+            dates = [...dates, nextWed];
+            notes = { ...notes, [nextWed]: {} };
+            generalNotes = { ...generalNotes, [nextWed]: '' };
+          }
+        }
+
+        const activeDate = dates[dates.length - 1] || '';
+
+        // Parse existing action items text from sheet (row 4) if present
+        let parsedActions = [];
+        const aiText = actionItems?.[activeDate];
+        if (aiText && typeof aiText === 'string' && aiText.trim()) {
+          // We have raw text from row 4 — display it as-is via the banner
+          // Re-parse from notes instead for structured data
+          for (const company of companies) {
+            const note = notes[activeDate]?.[company.name];
+            if (note) {
+              const items = parseActionItems(note, company.name);
+              parsedActions.push(...items);
+            }
+          }
+        }
+
+        dispatch({
+          type: 'LOAD_DATA',
+          payload: {
+            companies,
+            dates,
+            notes,
+            generalNotes,
+            actionItems: parsedActions,
+            activeDate,
+            selectedCompany: 0,
+            showActionItems: parsedActions.length > 0,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load sheet data:', err);
+        addToast('Failed to load data from Google Sheets', 'error');
+        dispatch({
+          type: 'LOAD_DATA',
+          payload: {
+            companies: [],
+            dates: [],
+            notes: {},
+            generalNotes: {},
+            actionItems: [],
+            activeDate: '',
+            selectedCompany: 0,
+          },
+        });
+      }
+    }
+    loadData();
+>>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
   }, []);
 
   const addToast = useCallback((message, type = 'success') => {
@@ -305,6 +385,7 @@ export default function MeetingPage() {
   async function handleSave() {
     dispatch({ type: 'SET_SAVING', saveState: 'saving' });
 
+<<<<<<< HEAD
     // Parse action items from all notes
     const allActions = [];
     for (const company of companies) {
@@ -325,6 +406,51 @@ export default function MeetingPage() {
     dispatch({ type: 'SET_SAVING', saveState: 'success' });
     dispatch({ type: 'SET_DIRTY', dirty: false });
     addToast('Notes saved & synced to Google Sheets');
+=======
+    try {
+      // Parse action items from all notes
+      const allActions = [];
+      for (const company of companies) {
+        const note = currentNotes[company.name];
+        if (note) {
+          const items = parseActionItems(note, company.name);
+          allActions.push(...items);
+        }
+      }
+      // Also parse general notes
+      const generalItems = parseActionItems(generalNotes[activeDate] || '', '');
+      allActions.push(...generalItems);
+
+      // Format action items as plain text for row 4
+      const grouped = groupActionsByOwner(allActions);
+      const actionItemsText = formatForSlack(grouped);
+
+      // Sync to Google Sheets
+      const res = await fetch('/api/sheet/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: activeDate,
+          notes: currentNotes,
+          generalNotes: generalNotes[activeDate] || '',
+          actionItems: actionItemsText,
+          companies,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Sync failed');
+
+      dispatch({ type: 'SET_ACTION_ITEMS', items: allActions });
+      dispatch({ type: 'SET_SAVING', saveState: 'success' });
+      dispatch({ type: 'SET_DIRTY', dirty: false });
+      addToast('Notes saved & synced to Google Sheets');
+    } catch (err) {
+      console.error('Save error:', err);
+      dispatch({ type: 'SET_SAVING', saveState: 'idle' });
+      addToast('Failed to save — check console for details', 'error');
+      return;
+    }
+>>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
 
     setTimeout(() => {
       dispatch({ type: 'SET_SAVING', saveState: 'idle' });
@@ -340,9 +466,27 @@ export default function MeetingPage() {
   }
 
   // ── Add company handler ───────────────────────────────
+<<<<<<< HEAD
   function handleAddCompany(company) {
     dispatch({ type: 'ADD_COMPANY', company });
     addToast('Company added to portfolio');
+=======
+  async function handleAddCompany(company) {
+    dispatch({ type: 'ADD_COMPANY', company });
+
+    try {
+      const res = await fetch('/api/sheet/add-company', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(company),
+      });
+      if (!res.ok) throw new Error('Failed to add company');
+      addToast('Company added to portfolio');
+    } catch (err) {
+      console.error('Add company error:', err);
+      addToast('Company added locally — sheet sync failed', 'error');
+    }
+>>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
   }
 
   // ── Loading screen ─────────────────────────────────────
