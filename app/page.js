@@ -174,11 +174,12 @@ function AddCompanyModal({ onClose, onAdd }) {
   );
 }
 
-// ── Action Items Banner ──────────────────────────────────────────
-function ActionItemsBanner({ actionItems, onDismiss }) {
+// ── Action Items Floating Panel ──────────────────────────────────
+function ActionItemsPanel({ actionItems, onDismiss }) {
   const grouped = groupActionsByOwner(actionItems);
   const owners = Object.keys(grouped);
   const [copied, setCopied] = useState(false);
+  const totalItems = actionItems.length;
 
   function handleCopy() {
     const text = formatForSlack(grouped);
@@ -190,45 +191,76 @@ function ActionItemsBanner({ actionItems, onDismiss }) {
   if (!owners.length) return null;
 
   return (
-    <div className="slide-down" style={styles.actionBanner}>
-      <div style={styles.actionHeader}>
-        <span className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <AlertCircle size={13} /> Action Items
-        </span>
-        <div style={{ display: 'flex', gap: '6px' }}>
-          <button className="btn btn-ghost" style={{ padding: '5px 10px', fontSize: '12px' }} onClick={handleCopy}>
-            <Copy size={12} /> {copied ? 'Copied!' : 'Copy for Slack'}
-          </button>
+    <div style={styles.actionOverlay} onClick={onDismiss}>
+      <div style={styles.actionPanel} onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div style={styles.actionPanelHeader}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={15} color="var(--cream)" />
+            <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '-0.4px' }}>
+              Action Items
+            </span>
+            <span style={{
+              fontSize: '11px', color: 'var(--cream-60)', background: 'var(--cream-08)',
+              padding: '2px 8px', marginLeft: '4px',
+            }}>
+              {totalItems}
+            </span>
+          </div>
           <button onClick={onDismiss} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cream-40)' }}>
-            <X size={14} />
+            <X size={16} />
           </button>
         </div>
-      </div>
 
-      <div style={styles.actionGrid}>
-        {owners.map((owner) => (
-          <div key={owner} style={styles.actionCard}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontWeight: 600, fontSize: '14px' }}>{owner}</span>
-              <span style={{ fontSize: '11px', color: 'var(--cream-40)', background: 'var(--cream-08)', padding: '2px 6px' }}>
-                {grouped[owner].length}
-              </span>
-            </div>
-            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {grouped[owner].map((item, i) => (
-                <li key={i} style={{ fontSize: '13px', color: 'var(--cream-80)', lineHeight: '1.5' }}>
-                  <span style={{ color: 'var(--cream-40)', marginRight: '6px' }}>–</span>
-                  {item.action}
-                  {item.company && (
-                    <span style={{ fontSize: '10px', color: 'var(--muted)', marginLeft: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      ({item.company})
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+        {/* Scrollable body */}
+        <div style={styles.actionPanelBody}>
+          <div style={styles.actionGrid}>
+            {owners.map((owner) => (
+              <div key={owner} style={styles.actionCard}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontWeight: 600, fontSize: '14px' }}>{owner}</span>
+                  <span style={{
+                    fontSize: '11px', color: 'var(--cream-40)', background: 'var(--cream-08)',
+                    padding: '2px 6px',
+                  }}>
+                    {grouped[owner].length}
+                  </span>
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {grouped[owner].map((item, i) => (
+                    <li key={i} style={{ fontSize: '13px', color: 'var(--cream-80)', lineHeight: '1.5' }}>
+                      <span style={{ color: 'var(--cream-40)', marginRight: '6px' }}>–</span>
+                      {item.action}
+                      {item.company && (
+                        <span style={{
+                          fontSize: '10px', color: 'var(--muted)', marginLeft: '6px',
+                          textTransform: 'uppercase', letterSpacing: '0.04em',
+                        }}>
+                          ({item.company})
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Footer with copy button */}
+        <div style={styles.actionPanelFooter}>
+          <button
+            className={`btn ${copied ? 'btn-success' : 'btn-primary'}`}
+            onClick={handleCopy}
+            style={{ padding: '10px 20px', fontSize: '13px', width: '100%', justifyContent: 'center' }}
+          >
+            {copied ? (
+              <><Check size={14} /> Copied to Clipboard</>
+            ) : (
+              <><Copy size={14} /> Copy for Slack</>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -537,14 +569,6 @@ export default function MeetingPage() {
         )}
       </div>
 
-      {/* ── ACTION ITEMS BANNER ────────────────────────────── */}
-      {showActionItems && (
-        <ActionItemsBanner
-          actionItems={actionItems}
-          onDismiss={() => dispatch({ type: 'DISMISS_ACTION_ITEMS' })}
-        />
-      )}
-
       {/* ── MAIN CONTENT ───────────────────────────────────── */}
       <div style={styles.mainContent}>
         {/* ── LEFT PANEL: Company List ──────────────────────── */}
@@ -720,6 +744,14 @@ export default function MeetingPage() {
         </div>
       </div>
 
+      {/* ── ACTION ITEMS FLOATING PANEL ─────────────────────── */}
+      {showActionItems && (
+        <ActionItemsPanel
+          actionItems={actionItems}
+          onDismiss={() => dispatch({ type: 'DISMISS_ACTION_ITEMS' })}
+        />
+      )}
+
       {/* ── ADD COMPANY MODAL ──────────────────────────────── */}
       {showAddModal && (
         <AddCompanyModal
@@ -827,26 +859,55 @@ const styles = {
     fontFamily: 'Outfit, sans-serif',
   },
 
-  // Action items banner
-  actionBanner: {
-    padding: '16px 20px',
-    background: 'var(--surface-1)',
-    borderBottom: '1px solid var(--cream-08)',
+  // Action items floating panel
+  actionOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0, 0, 0, 0.65)',
+    backdropFilter: 'blur(6px)',
+    zIndex: 950,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    animation: 'fadeIn 150ms ease',
   },
-  actionHeader: {
+  actionPanel: {
+    background: 'var(--surface-1)',
+    border: '1px solid var(--cream-12)',
+    boxShadow: 'var(--shadow-lg)',
+    width: '680px',
+    maxWidth: '92vw',
+    maxHeight: '80vh',
+    display: 'flex',
+    flexDirection: 'column',
+    animation: 'modalIn 200ms ease',
+  },
+  actionPanelHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '12px',
+    padding: '18px 22px',
+    borderBottom: '1px solid var(--cream-08)',
+    flexShrink: 0,
+  },
+  actionPanelBody: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '18px 22px',
+  },
+  actionPanelFooter: {
+    padding: '14px 22px',
+    borderTop: '1px solid var(--cream-08)',
+    flexShrink: 0,
   },
   actionGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '10px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '12px',
   },
   actionCard: {
-    background: 'var(--surface-3)',
-    padding: '14px',
+    background: 'var(--surface-2)',
+    padding: '16px',
     boxShadow: 'var(--shadow-sm)',
     border: '1px solid var(--cream-08)',
   },
