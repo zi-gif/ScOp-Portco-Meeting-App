@@ -5,14 +5,7 @@ import {
   Search, Plus, User, Users, Clock, ChevronRight, ChevronDown,
   Save, Loader2, Check, X, Copy, CalendarPlus, AlertCircle,
 } from 'lucide-react';
-<<<<<<< HEAD
-import {
-  MOCK_COMPANIES, MOCK_DATES, MOCK_NOTES, MOCK_GENERAL_NOTES,
-  MOCK_ACTION_ITEMS, TEAM_MEMBERS, LOGO_MAP,
-} from '@/lib/mockData';
-=======
 import { TEAM_MEMBERS, LOGO_MAP } from '@/lib/mockData';
->>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
 import { parseActionItems, groupActionsByOwner, formatForSlack } from '@/lib/actionParser';
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -251,26 +244,6 @@ export default function MeetingPage() {
   const [toasts, setToasts] = useState([]);
   const noteRef = useRef(null);
 
-<<<<<<< HEAD
-  // Load mock data on mount
-  useEffect(() => {
-    // Simulate API load
-    const timer = setTimeout(() => {
-      dispatch({
-        type: 'LOAD_DATA',
-        payload: {
-          companies: MOCK_COMPANIES,
-          dates: MOCK_DATES,
-          notes: MOCK_NOTES,
-          generalNotes: MOCK_GENERAL_NOTES,
-          actionItems: MOCK_ACTION_ITEMS['3/25'] || [],
-          activeDate: MOCK_DATES[MOCK_DATES.length - 1],
-          selectedCompany: 0,
-        },
-      });
-    }, 400);
-    return () => clearTimeout(timer);
-=======
   // Load live data from Google Sheets on mount
   useEffect(() => {
     async function loadData() {
@@ -344,7 +317,6 @@ export default function MeetingPage() {
       }
     }
     loadData();
->>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
   }, []);
 
   const addToast = useCallback((message, type = 'success') => {
@@ -385,28 +357,6 @@ export default function MeetingPage() {
   async function handleSave() {
     dispatch({ type: 'SET_SAVING', saveState: 'saving' });
 
-<<<<<<< HEAD
-    // Parse action items from all notes
-    const allActions = [];
-    for (const company of companies) {
-      const note = currentNotes[company.name];
-      if (note) {
-        const items = parseActionItems(note, company.name);
-        allActions.push(...items);
-      }
-    }
-    // Also parse general notes
-    const generalItems = parseActionItems(generalNotes[activeDate] || '', '');
-    allActions.push(...generalItems);
-
-    // Simulate API delay
-    await new Promise((r) => setTimeout(r, 800));
-
-    dispatch({ type: 'SET_ACTION_ITEMS', items: allActions });
-    dispatch({ type: 'SET_SAVING', saveState: 'success' });
-    dispatch({ type: 'SET_DIRTY', dirty: false });
-    addToast('Notes saved & synced to Google Sheets');
-=======
     try {
       // Parse action items from all notes
       const allActions = [];
@@ -450,7 +400,6 @@ export default function MeetingPage() {
       addToast('Failed to save — check console for details', 'error');
       return;
     }
->>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
 
     setTimeout(() => {
       dispatch({ type: 'SET_SAVING', saveState: 'idle' });
@@ -466,11 +415,6 @@ export default function MeetingPage() {
   }
 
   // ── Add company handler ───────────────────────────────
-<<<<<<< HEAD
-  function handleAddCompany(company) {
-    dispatch({ type: 'ADD_COMPANY', company });
-    addToast('Company added to portfolio');
-=======
   async function handleAddCompany(company) {
     dispatch({ type: 'ADD_COMPANY', company });
 
@@ -486,7 +430,6 @@ export default function MeetingPage() {
       console.error('Add company error:', err);
       addToast('Company added locally — sheet sync failed', 'error');
     }
->>>>>>> d30c137 (Initial commit — ScOp Portfolio Meeting App)
   }
 
   // ── Loading screen ─────────────────────────────────────
