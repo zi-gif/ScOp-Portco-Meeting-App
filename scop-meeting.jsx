@@ -640,7 +640,7 @@ body {
 .company-status.inactive { background: var(--red); opacity: 0.5; }
 
 .company-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--cream);
@@ -666,7 +666,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   font-weight: 400;
 }
@@ -676,7 +676,7 @@ body {
 .meta-sep { color: var(--cream-12); font-size: 10px; margin: 0 2px; }
 
 .company-preview {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--cream-40);
   line-height: 1.3;
   overflow: hidden;
@@ -732,10 +732,11 @@ body {
 .detail-header {
   padding: 28px 40px 24px;
   border-bottom: 1px solid var(--cream-08);
+  flex-shrink: 0;
 }
 
 .detail-name {
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 600;
   letter-spacing: -0.8px;
   color: var(--cream);
@@ -773,11 +774,11 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--cream-60);
 }
 
-.detail-badge svg { width: 14px; height: 14px; opacity: 0.4; }
+.detail-badge svg { width: 15px; height: 15px; opacity: 0.4; }
 .detail-badge strong { font-weight: 500; color: var(--cream); }
 
 /* ── Note Section ── */
@@ -787,7 +788,7 @@ body {
 }
 
 .section-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -802,9 +803,9 @@ body {
 
 .note-textarea {
   width: 100%;
-  min-height: 140px;
-  padding: 14px 16px;
-  font-size: 16px;
+  min-height: 160px;
+  padding: 16px 18px;
+  font-size: 18px;
   font-family: var(--font);
   font-weight: 400;
   line-height: 1.65;
@@ -822,7 +823,7 @@ body {
 .note-textarea::placeholder { color: var(--muted); }
 
 .prev-note {
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.6;
   color: var(--cream-60);
   padding: 14px 16px;
@@ -837,7 +838,7 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--cream-60);
   cursor: pointer;
@@ -854,8 +855,8 @@ body {
 .history-entries { margin-top: 14px; animation: fadeUp 0.2s ease both; }
 
 .history-entry { padding: 10px 0; border-top: 1px solid var(--cream-04); }
-.history-date { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
-.history-text { font-size: 15px; color: var(--cream-60); line-height: 1.5; }
+.history-date { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+.history-text { font-size: 17px; color: var(--cream-60); line-height: 1.55; }
 .history-text.empty { color: var(--cream-20); font-style: italic; }
 
 /* ═══════════ ADD COMPANY MODAL ═══════════ */
@@ -1261,15 +1262,14 @@ export default function ScOpMeeting() {
                 <span>Select a company to begin</span>
               </div>
             ) : (
-              <div className="detail-scroll" key={selectedIdx}>
-                <div className="detail-header">
-                  <div className="detail-name">{selected.name}</div>
-                  <div className="detail-badges">
-                    <span className="detail-badge"><User size={14} /> Analyst <strong>{selected.analyst}</strong></span>
-                    <span className="detail-badge"><Users size={14} /> Partner <strong>{selected.partner}</strong></span>
-                  </div>
+              <div className="detail-header" key={`header-${selectedIdx}`}>
+                <div className="detail-name">{selected.name}</div>
+                <div className="detail-badges">
+                  <span className="detail-badge"><User size={14} /> Analyst <strong>{selected.analyst}</strong></span>
+                  <span className="detail-badge"><Users size={14} /> Partner <strong>{selected.partner}</strong></span>
                 </div>
-
+              </div>
+              <div className="detail-scroll" key={selectedIdx}>
                 <div className="section">
                   <div className="section-label">
                     <Clock size={13} />
