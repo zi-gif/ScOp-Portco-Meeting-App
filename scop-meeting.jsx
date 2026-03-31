@@ -999,6 +999,7 @@ export default function ScOpMeeting() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', analyst: 'Zi', partner: 'Cormac' });
   const textareaRef = useRef(null);
+  const companyListRef = useRef(null);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return companies.map((c, i) => ({ ...c, _idx: i }));
@@ -1099,6 +1100,42 @@ export default function ScOpMeeting() {
   }, [selectedIdx, currentDate, selected]);
 
   useEffect(() => { setHistoryOpen(false); }, [selectedIdx]);
+
+  // Auto-scroll selected company into view in the left panel
+  useEffect(() => {
+    if (selectedIdx === null || !companyListRef.current) return;
+    const list = companyListRef.current;
+    const rows = list.querySelectorAll('.company-row');
+    const filteredIdx = filtered.findIndex(c => c._idx === selectedIdx);
+    if (filteredIdx >= 0 && rows[filteredIdx]) {
+      rows[filteredIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [selectedIdx, filtered]);
+
+  // Keyboard navigation: up/down arrows to switch companies
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't intercept if user is typing in a textarea or input
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const currentFilteredIdx = filtered.findIndex(c => c._idx === selectedIdx);
+        if (e.key === 'ArrowDown') {
+          if (selectedIdx === null) {
+            if (filtered.length > 0) setSelectedIdx(filtered[0]._idx);
+          } else if (currentFilteredIdx < filtered.length - 1) {
+            setSelectedIdx(filtered[currentFilteredIdx + 1]._idx);
+          }
+        } else if (e.key === 'ArrowUp') {
+          if (currentFilteredIdx > 0) {
+            setSelectedIdx(filtered[currentFilteredIdx - 1]._idx);
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIdx, filtered]);
 
   return (
     <>
@@ -1228,7 +1265,7 @@ export default function ScOpMeeting() {
                 <Plus /> Add Company
               </button>
             </div>
-            <div className="company-list">
+            <div className="company-list" ref={companyListRef}>
               {filtered.map((c, fi) => {
                 const status = getStatus(c, currentDate, dates);
                 const preview = (c.notes[currentDate] || '').trim();
