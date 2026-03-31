@@ -183,7 +183,7 @@ const css = `
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body, #root { height: 100%; overflow: hidden; }
+html, body, #root { height: 100%; margin: 0; padding: 0; overflow: hidden; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
 
 body {
   background: var(--black);
@@ -197,7 +197,7 @@ body {
 }
 
 /* ═══════════ APP SHELL ═══════════ */
-.app { display: flex; flex-direction: column; height: 100vh; }
+.app { display: flex; flex-direction: column; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
 
 /* ═══════════ HEADER ═══════════ */
 .header {
@@ -518,7 +518,7 @@ body {
 }
 
 /* ═══════════ MAIN LAYOUT ═══════════ */
-.main { display: flex; flex: 1; min-height: 0; }
+.main { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 
 /* ═══════════ LEFT PANEL ═══════════ */
 .panel-left {
@@ -528,6 +528,8 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--black);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .search-wrap {
@@ -536,6 +538,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .search-wrap svg { color: var(--muted); width: 16px; height: 16px; flex-shrink: 0; }
@@ -557,6 +560,7 @@ body {
 .add-btn-wrap {
   padding: 10px 20px;
   border-bottom: 1px solid var(--cream-08);
+  flex-shrink: 0;
 }
 
 .add-btn {
@@ -702,6 +706,8 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   background: var(--black);
 }
 
@@ -730,22 +736,22 @@ body {
 
 /* ── Detail Header ── */
 .detail-header {
-  padding: 32px 48px 28px;
+  padding: 40px 56px 32px;
   border-bottom: 1px solid var(--cream-08);
   flex-shrink: 0;
 }
 
 .detail-name {
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 600;
-  letter-spacing: -1.2px;
+  letter-spacing: -1.5px;
   color: var(--cream);
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .detail-badges {
   display: flex;
-  gap: 20px;
+  gap: 28px;
 }
 
 /* ── New Week Button ── */
@@ -774,26 +780,26 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 20px;
+  font-size: 28px;
   color: var(--cream-60);
 }
 
-.detail-badge svg { width: 18px; height: 18px; opacity: 0.4; }
+.detail-badge svg { width: 22px; height: 22px; opacity: 0.4; }
 .detail-badge strong { font-weight: 500; color: var(--cream); }
 
 /* ── Note Section ── */
 .section {
-  padding: 32px 48px;
+  padding: 40px 56px;
   border-bottom: 1px solid var(--cream-08);
 }
 
 .section-label {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -803,9 +809,9 @@ body {
 
 .note-textarea {
   width: 100%;
-  min-height: 200px;
-  padding: 20px 22px;
-  font-size: 24px;
+  min-height: 240px;
+  padding: 24px 26px;
+  font-size: 32px;
   font-family: var(--font);
   font-weight: 400;
   line-height: 1.6;
@@ -823,10 +829,10 @@ body {
 .note-textarea::placeholder { color: var(--muted); }
 
 .prev-note {
-  font-size: 22px;
-  line-height: 1.55;
+  font-size: 30px;
+  line-height: 1.5;
   color: var(--cream-60);
-  padding: 18px 20px;
+  padding: 22px 24px;
   background: var(--surface-2);
   border-left: 2px solid var(--cream-12);
 }
@@ -837,8 +843,8 @@ body {
 .history-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
+  gap: 10px;
+  font-size: 24px;
   font-weight: 500;
   color: var(--cream-60);
   cursor: pointer;
@@ -855,8 +861,8 @@ body {
 .history-entries { margin-top: 14px; animation: fadeUp 0.2s ease both; }
 
 .history-entry { padding: 10px 0; border-top: 1px solid var(--cream-04); }
-.history-date { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
-.history-text { font-size: 22px; color: var(--cream-60); line-height: 1.5; }
+.history-date { font-size: 22px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+.history-text { font-size: 30px; color: var(--cream-60); line-height: 1.45; }
 .history-text.empty { color: var(--cream-20); font-style: italic; }
 
 /* ═══════════ ADD COMPANY MODAL ═══════════ */
