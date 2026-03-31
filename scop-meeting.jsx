@@ -522,8 +522,8 @@ body {
 
 /* ═══════════ LEFT PANEL ═══════════ */
 .panel-left {
-  width: 380px;
-  min-width: 380px;
+  width: 280px;
+  min-width: 280px;
   border-right: 1px solid var(--cream-08);
   display: flex;
   flex-direction: column;
@@ -730,15 +730,15 @@ body {
 
 /* ── Detail Header ── */
 .detail-header {
-  padding: 28px 40px 24px;
+  padding: 32px 48px 28px;
   border-bottom: 1px solid var(--cream-08);
   flex-shrink: 0;
 }
 
 .detail-name {
-  font-size: 34px;
+  font-size: 48px;
   font-weight: 600;
-  letter-spacing: -0.8px;
+  letter-spacing: -1.2px;
   color: var(--cream);
   margin-bottom: 10px;
 }
@@ -774,26 +774,26 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 16px;
+  font-size: 20px;
   color: var(--cream-60);
 }
 
-.detail-badge svg { width: 15px; height: 15px; opacity: 0.4; }
+.detail-badge svg { width: 18px; height: 18px; opacity: 0.4; }
 .detail-badge strong { font-weight: 500; color: var(--cream); }
 
 /* ── Note Section ── */
 .section {
-  padding: 24px 40px;
+  padding: 32px 48px;
   border-bottom: 1px solid var(--cream-08);
 }
 
 .section-label {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -803,12 +803,12 @@ body {
 
 .note-textarea {
   width: 100%;
-  min-height: 160px;
-  padding: 16px 18px;
-  font-size: 18px;
+  min-height: 200px;
+  padding: 20px 22px;
+  font-size: 24px;
   font-family: var(--font);
   font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.6;
   letter-spacing: -0.01em;
   color: var(--cream);
   background: var(--surface-2);
@@ -823,10 +823,10 @@ body {
 .note-textarea::placeholder { color: var(--muted); }
 
 .prev-note {
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 22px;
+  line-height: 1.55;
   color: var(--cream-60);
-  padding: 14px 16px;
+  padding: 18px 20px;
   background: var(--surface-2);
   border-left: 2px solid var(--cream-12);
 }
@@ -837,8 +837,8 @@ body {
 .history-toggle {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 13px;
+  gap: 8px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--cream-60);
   cursor: pointer;
@@ -855,8 +855,8 @@ body {
 .history-entries { margin-top: 14px; animation: fadeUp 0.2s ease both; }
 
 .history-entry { padding: 10px 0; border-top: 1px solid var(--cream-04); }
-.history-date { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-.history-text { font-size: 17px; color: var(--cream-60); line-height: 1.55; }
+.history-date { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.history-text { font-size: 22px; color: var(--cream-60); line-height: 1.5; }
 .history-text.empty { color: var(--cream-20); font-style: italic; }
 
 /* ═══════════ ADD COMPANY MODAL ═══════════ */
