@@ -68,19 +68,19 @@ h1, h2, h3, h4, h5, h6 {
 /* Textarea */
 textarea {
   font-family: 'Outfit', sans-serif;
-  font-size: 14px;
+  font-size: 28px;
   font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--cream);
   background: var(--surface-2);
   border: 1px solid var(--cream-08);
   border-radius: 0;
-  padding: 12px 14px;
+  padding: 20px 22px;
   width: 100%;
   resize: vertical;
   outline: none;
   transition: border-color 150ms ease;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 textarea:focus {
   border-color: var(--cream-20);

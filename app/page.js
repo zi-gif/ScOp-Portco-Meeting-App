@@ -275,6 +275,7 @@ export default function MeetingPage() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const noteRef = useRef(null);
+  const companyListRef = useRef(null);
 
   // Load live data from Google Sheets on mount
   useEffect(() => {
@@ -464,6 +465,41 @@ export default function MeetingPage() {
     }
   }
 
+  // Keyboard navigation: up/down arrows to switch companies
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const currentFilteredIdx = filteredCompanies.findIndex((c) => companies.indexOf(c) === selectedCompany);
+        if (e.key === 'ArrowDown') {
+          if (currentFilteredIdx < filteredCompanies.length - 1) {
+            const nextCompany = filteredCompanies[currentFilteredIdx + 1];
+            dispatch({ type: 'SELECT_COMPANY', index: companies.indexOf(nextCompany) });
+          }
+        } else if (e.key === 'ArrowUp') {
+          if (currentFilteredIdx > 0) {
+            const prevCompany = filteredCompanies[currentFilteredIdx - 1];
+            dispatch({ type: 'SELECT_COMPANY', index: companies.indexOf(prevCompany) });
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCompany, filteredCompanies, companies]);
+
+  // Auto-scroll selected company into view
+  useEffect(() => {
+    if (companyListRef.current) {
+      const rows = companyListRef.current.querySelectorAll('button');
+      const idx = filteredCompanies.findIndex((c) => companies.indexOf(c) === selectedCompany);
+      if (idx >= 0 && rows[idx]) {
+        rows[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }, [selectedCompany, filteredCompanies, companies]);
+
   // ── Loading screen ─────────────────────────────────────
   if (loading) {
     return (
@@ -594,7 +630,7 @@ export default function MeetingPage() {
           </button>
 
           {/* Company list */}
-          <div style={styles.companyList}>
+          <div style={styles.companyList} ref={companyListRef}>
             {filteredCompanies.map((company, filteredIdx) => {
               const realIdx = companies.indexOf(company);
               const status = getCompanyStatus(
@@ -653,39 +689,21 @@ export default function MeetingPage() {
               <div style={styles.detailHeader}>
                 <div>
                   <h2 style={styles.detailName}>{selectedCo.name}</h2>
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
+                  <div style={{ display: 'flex', gap: '24px', marginTop: '6px' }}>
                     <span style={styles.detailBadge}>
-                      <User size={12} /> {selectedCo.analyst}
+                      <User size={18} /> {selectedCo.analyst}
                     </span>
                     <span style={styles.detailBadge}>
-                      <Users size={12} /> {selectedCo.partner}
+                      <Users size={18} /> {selectedCo.partner}
                     </span>
                   </div>
                 </div>
-                {/* Logo */}
-                {LOGO_MAP[selectedCo.name] ? (
-                  <div style={styles.logoContainer}>
-                    <img
-                      src={LOGO_MAP[selectedCo.name]}
-                      alt={selectedCo.name}
-                      style={styles.companyLogo}
-                      onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                    />
-                    <div style={{ ...styles.logoPlaceholder, display: 'none' }}>
-                      {selectedCo.name[0]}
-                    </div>
-                  </div>
-                ) : (
-                  <div style={styles.logoPlaceholder}>
-                    {selectedCo.name[0]}
-                  </div>
-                )}
               </div>
 
               {/* This week's notes */}
               <div style={{ marginTop: '24px' }}>
-                <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                  <Clock size={12} /> This Week · {activeDate}
+                <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+                  <Clock size={16} /> This Week · {activeDate}
                 </label>
                 <textarea
                   ref={noteRef}
@@ -699,7 +717,7 @@ export default function MeetingPage() {
               {/* Previous week's notes */}
               {prevDate && prevNotes[selectedCo.name] && (
                 <div style={{ marginTop: '20px' }}>
-                  <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                  <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
                     Previous Week · {prevDate}
                   </label>
                   <div style={styles.prevNotes}>
@@ -725,8 +743,8 @@ export default function MeetingPage() {
                       if (date === activeDate) return null;
                       return (
                         <div key={date} style={styles.historyItem}>
-                          <span className="section-label" style={{ fontSize: '10px' }}>{date}</span>
-                          <p style={{ fontSize: '13px', color: 'var(--cream-60)', marginTop: '4px', lineHeight: '1.5' }}>
+                          <span className="section-label" style={{ fontSize: '18px' }}>{date}</span>
+                          <p style={{ fontSize: '26px', color: 'var(--cream-60)', marginTop: '4px', lineHeight: '1.5' }}>
                             {note}
                           </p>
                         </div>
@@ -773,7 +791,8 @@ export default function MeetingPage() {
 // ── Styles ─────────────────────────────────────────────────────
 const styles = {
   app: {
-    minHeight: '100vh',
+    height: '100vh',
+    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     background: 'var(--black)',
@@ -921,7 +940,7 @@ const styles = {
 
   // Left panel
   leftPanel: {
-    width: '380px',
+    width: '280px',
     flexShrink: 0,
     display: 'flex',
     flexDirection: 'column',
@@ -1033,7 +1052,7 @@ const styles = {
   // Right panel
   rightPanel: {
     flex: 1,
-    padding: '24px 28px',
+    padding: '40px 56px',
     overflowY: 'auto',
   },
   detailHeader: {
@@ -1042,16 +1061,16 @@ const styles = {
     alignItems: 'flex-start',
   },
   detailName: {
-    fontSize: '22px',
+    fontSize: '48px',
     fontWeight: 600,
-    letterSpacing: '-0.6px',
+    letterSpacing: '-1.2px',
     color: 'var(--cream)',
   },
   detailBadge: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '5px',
-    fontSize: '12px',
+    gap: '8px',
+    fontSize: '24px',
     color: 'var(--cream-60)',
   },
   logoContainer: {
@@ -1083,9 +1102,9 @@ const styles = {
     flexShrink: 0,
   },
   prevNotes: {
-    padding: '12px 14px',
+    padding: '20px 22px',
     borderLeft: '2px solid var(--cream-12)',
-    fontSize: '13px',
+    fontSize: '26px',
     color: 'var(--cream-40)',
     lineHeight: '1.6',
     background: 'var(--cream-04)',
@@ -1098,7 +1117,7 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
     color: 'var(--cream-40)',
-    fontSize: '13px',
+    fontSize: '22px',
     fontFamily: 'Outfit, sans-serif',
     fontWeight: 500,
   },
