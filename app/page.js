@@ -689,12 +689,12 @@ export default function MeetingPage() {
               <div style={styles.detailHeader}>
                 <div>
                   <h2 style={styles.detailName}>{selectedCo.name}</h2>
-                  <div style={{ display: 'flex', gap: '24px', marginTop: '6px' }}>
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
                     <span style={styles.detailBadge}>
-                      <User size={18} /> {selectedCo.analyst}
+                      <User size={12} /> {selectedCo.analyst}
                     </span>
                     <span style={styles.detailBadge}>
-                      <Users size={18} /> {selectedCo.partner}
+                      <Users size={12} /> {selectedCo.partner}
                     </span>
                   </div>
                 </div>
@@ -702,8 +702,8 @@ export default function MeetingPage() {
 
               {/* This week's notes */}
               <div style={{ marginTop: '24px' }}>
-                <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
-                  <Clock size={16} /> This Week · {activeDate}
+                <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                  <Clock size={12} /> This Week · {activeDate}
                 </label>
                 <textarea
                   ref={noteRef}
@@ -717,7 +717,7 @@ export default function MeetingPage() {
               {/* Previous week's notes */}
               {prevDate && prevNotes[selectedCo.name] && (
                 <div style={{ marginTop: '20px' }}>
-                  <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+                  <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                     Previous Week · {prevDate}
                   </label>
                   <div style={styles.prevNotes}>
@@ -743,8 +743,8 @@ export default function MeetingPage() {
                       if (date === activeDate) return null;
                       return (
                         <div key={date} style={styles.historyItem}>
-                          <span className="section-label" style={{ fontSize: '18px' }}>{date}</span>
-                          <p style={{ fontSize: '26px', color: 'var(--cream-60)', marginTop: '4px', lineHeight: '1.5' }}>
+                          <span className="section-label" style={{ fontSize: '10px' }}>{date}</span>
+                          <p style={{ fontSize: '13px', color: 'var(--cream-60)', marginTop: '4px', lineHeight: '1.5' }}>
                             {note}
                           </p>
                         </div>
@@ -1052,7 +1052,7 @@ const styles = {
   // Right panel
   rightPanel: {
     flex: 1,
-    padding: '40px 56px',
+    padding: '24px 32px',
     overflowY: 'auto',
   },
   detailHeader: {
@@ -1061,16 +1061,16 @@ const styles = {
     alignItems: 'flex-start',
   },
   detailName: {
-    fontSize: '48px',
+    fontSize: '24px',
     fontWeight: 600,
-    letterSpacing: '-1.2px',
+    letterSpacing: '-0.6px',
     color: 'var(--cream)',
   },
   detailBadge: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '24px',
+    gap: '5px',
+    fontSize: '12px',
     color: 'var(--cream-60)',
   },
   logoContainer: {
@@ -1102,9 +1102,9 @@ const styles = {
     flexShrink: 0,
   },
   prevNotes: {
-    padding: '20px 22px',
+    padding: '12px 14px',
     borderLeft: '2px solid var(--cream-12)',
-    fontSize: '26px',
+    fontSize: '13px',
     color: 'var(--cream-40)',
     lineHeight: '1.6',
     background: 'var(--cream-04)',
@@ -1117,7 +1117,7 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
     color: 'var(--cream-40)',
-    fontSize: '22px',
+    fontSize: '13px',
     fontFamily: 'Outfit, sans-serif',
     fontWeight: 500,
   },

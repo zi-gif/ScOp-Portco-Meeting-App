@@ -68,14 +68,14 @@ h1, h2, h3, h4, h5, h6 {
 /* Textarea */
 textarea {
   font-family: 'Outfit', sans-serif;
-  font-size: 28px;
+  font-size: 14px;
   font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--cream);
   background: var(--surface-2);
   border: 1px solid var(--cream-08);
   border-radius: 0;
-  padding: 20px 22px;
+  padding: 12px 14px;
   width: 100%;
   resize: vertical;
   outline: none;
