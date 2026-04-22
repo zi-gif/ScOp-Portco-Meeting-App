@@ -53,6 +53,12 @@ function appReducer(state, action) {
       newGeneral[state.activeDate] = action.text;
       return { ...state, generalNotes: newGeneral, dirty: true };
     }
+    case 'UPDATE_ARR': {
+      const newCompanies = state.companies.map((c, i) =>
+        i === action.index ? { ...c, arr: action.value } : c
+      );
+      return { ...state, companies: newCompanies, dirty: true };
+    }
     case 'ADD_COMPANY': {
       const newCompanies = [action.company, ...state.companies];
       return { ...state, companies: newCompanies, selectedCompany: 0, dirty: true };
@@ -698,6 +704,19 @@ export default function MeetingPage() {
                     </span>
                   </div>
                 </div>
+              </div>
+
+              {/* Current ARR */}
+              <div style={{ marginTop: '24px' }}>
+                <label className="section-label" style={{ display: 'block', marginBottom: '8px' }}>
+                  Current ARR
+                </label>
+                <input
+                  type="text"
+                  value={selectedCo.arr || ''}
+                  onChange={(e) => dispatch({ type: 'UPDATE_ARR', index: selectedCompany, value: e.target.value })}
+                  placeholder="e.g. $2.5M"
+                />
               </div>
 
               {/* This week's notes */}
