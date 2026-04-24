@@ -547,7 +547,6 @@ export default function MeetingPage() {
             rel="noopener noreferrer"
             style={styles.databaseLink}
           >
-            <span style={styles.databaseLinkDot} />
             Database
           </a>
         </div>
@@ -869,27 +868,16 @@ const styles = {
     justifyContent: 'flex-end',
   },
   databaseLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
     fontSize: '13px',
     fontWeight: 500,
     letterSpacing: '0.02em',
-    color: 'var(--cream)',
+    color: 'var(--cream-80)',
     textDecoration: 'none',
-    padding: '6px 16px',
+    padding: '6px 14px',
     border: '1px solid var(--cream-12)',
-    borderRadius: '999px',
-    background: 'transparent',
+    borderRadius: '6px',
     transition: 'all 150ms ease',
     fontFamily: 'Outfit, sans-serif',
-  },
-  databaseLinkDot: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '999px',
-    background: 'var(--green, #6fcf6f)',
-    flexShrink: 0,
   },
 
   // Date bar
