@@ -540,6 +540,17 @@ export default function MeetingPage() {
           </span>
         </div>
 
+        <div style={styles.headerCenter}>
+          <a
+            href="https://scop-portfolio-db.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.databaseLink}
+          >
+            Database
+          </a>
+        </div>
+
         <div style={styles.headerRight}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '12px', color: 'var(--cream-40)' }}>
@@ -832,6 +843,13 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
+    flex: 1,
+  },
+  headerCenter: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
   },
   headerDivider: {
     width: '1px',
@@ -842,6 +860,20 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  databaseLink: {
+    fontSize: '13px',
+    fontWeight: 500,
+    letterSpacing: '0.02em',
+    color: 'var(--cream-80)',
+    textDecoration: 'none',
+    padding: '6px 14px',
+    border: '1px solid var(--cream-12)',
+    borderRadius: '6px',
+    transition: 'all 150ms ease',
+    fontFamily: 'Outfit, sans-serif',
   },
 
   // Date bar
