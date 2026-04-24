@@ -597,8 +597,12 @@ export default function MeetingPage() {
             </button>
           ))}
         </div>
-        <button className="btn btn-new-week" style={{ padding: '5px 12px', fontSize: '12px' }} onClick={handleNewWeek}>
-          <CalendarPlus size={13} /> New Week
+        <button
+          className="btn btn-new-week"
+          style={{ padding: '4px 10px', fontSize: '11px', whiteSpace: 'nowrap', flexShrink: 0 }}
+          onClick={handleNewWeek}
+        >
+          <CalendarPlus size={12} /> New Week
         </button>
       </div>
 
@@ -882,7 +886,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 20px',
-    height: '42px',
+    gap: '12px',
+    height: '30px',
     background: 'var(--surface-1)',
     borderBottom: '1px solid var(--cream-08)',
     flexShrink: 0,
@@ -891,13 +896,15 @@ const styles = {
     display: 'flex',
     gap: '2px',
     overflow: 'auto',
+    flex: 1,
+    minWidth: 0,
   },
   dateTab: {
     background: 'none',
     border: 'none',
     color: 'var(--cream-40)',
-    padding: '8px 14px',
-    fontSize: '13px',
+    padding: '4px 10px',
+    fontSize: '12px',
     fontWeight: 400,
     letterSpacing: '0.02em',
     cursor: 'pointer',
@@ -905,6 +912,7 @@ const styles = {
     transition: 'all 150ms ease',
     borderBottom: '2px solid transparent',
     whiteSpace: 'nowrap',
+    lineHeight: 1,
   },
   dateTabActive: {
     color: 'var(--cream)',
