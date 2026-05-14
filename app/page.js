@@ -717,15 +717,28 @@ export default function MeetingPage() {
               {(() => {
                 const key = (selectedCo.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                 const m = portfolioMetrics.byName?.[key];
+                const growth = m?.growth || '';
+                const period = (m?.growthPeriod || '').toUpperCase();
+                const growthColor = growth.startsWith('+')
+                  ? 'var(--green)'
+                  : growth.startsWith('-')
+                  ? 'var(--red)'
+                  : 'var(--cream)';
+                const showPeriodTag = growth && period && period !== 'YOY';
                 return (
                   <div style={styles.metricsRow}>
                     <div style={styles.metricCell}>
-                      <span style={styles.metricLabel}>ARR</span>
+                      <span style={styles.metricLabel}>ARR / Rev</span>
                       <span style={styles.metricValue}>{m?.arr || '—'}</span>
                     </div>
                     <div style={styles.metricCell}>
-                      <span style={styles.metricLabel}>Growth</span>
-                      <span style={styles.metricValue}>{m?.growth || '—'}</span>
+                      <span style={styles.metricLabel}>Growth YOY</span>
+                      <span style={{ ...styles.metricValue, color: growthColor, display: 'inline-flex', alignItems: 'baseline', gap: '8px' }}>
+                        {growth || '—'}
+                        {showPeriodTag && (
+                          <span style={styles.metricPeriodTag}>{period}</span>
+                        )}
+                      </span>
                     </div>
                     <div style={styles.metricCell}>
                       <span style={styles.metricLabel}>Runway</span>
@@ -1196,6 +1209,13 @@ const styles = {
     fontWeight: 600,
     color: 'var(--cream)',
     letterSpacing: '-0.3px',
+  },
+  metricPeriodTag: {
+    fontSize: '10px',
+    fontWeight: 600,
+    letterSpacing: '0.08em',
+    color: 'var(--amber)',
+    textTransform: 'uppercase',
   },
   historyToggle: {
     display: 'flex',
