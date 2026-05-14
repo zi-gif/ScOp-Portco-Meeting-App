@@ -47,12 +47,6 @@ function appReducer(state, action) {
       newGeneral[state.activeDate] = action.text;
       return { ...state, generalNotes: newGeneral, dirty: true };
     }
-    case 'UPDATE_ARR': {
-      const newCompanies = state.companies.map((c, i) =>
-        i === action.index ? { ...c, arr: action.value } : c
-      );
-      return { ...state, companies: newCompanies, dirty: true };
-    }
     case 'ADD_COMPANY': {
       const newCompanies = [action.company, ...state.companies];
       return { ...state, companies: newCompanies, selectedCompany: 0, dirty: true };
@@ -719,40 +713,23 @@ export default function MeetingPage() {
                 </div>
               </div>
 
-              {/* Current ARR */}
-              <div style={{ marginTop: '24px' }}>
-                <label className="section-label" style={{ display: 'block', marginBottom: '8px' }}>
-                  Current ARR
-                </label>
-                <input
-                  type="text"
-                  value={selectedCo.arr || ''}
-                  onChange={(e) => dispatch({ type: 'UPDATE_ARR', index: selectedCompany, value: e.target.value })}
-                  placeholder="e.g. $2.5M"
-                />
-              </div>
-
               {/* Metrics from Portfolio DB */}
               {(() => {
                 const key = (selectedCo.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                 const m = portfolioMetrics.byName?.[key];
-                const arr = m?.arr || '';
-                const growth = m?.growth || '';
-                const runway = m?.runway || '';
-                if (!arr && !growth && !runway) return null;
                 return (
                   <div style={styles.metricsRow}>
                     <div style={styles.metricCell}>
                       <span style={styles.metricLabel}>ARR</span>
-                      <span style={styles.metricValue}>{arr || '—'}</span>
+                      <span style={styles.metricValue}>{m?.arr || '—'}</span>
                     </div>
                     <div style={styles.metricCell}>
                       <span style={styles.metricLabel}>Growth</span>
-                      <span style={styles.metricValue}>{growth || '—'}</span>
+                      <span style={styles.metricValue}>{m?.growth || '—'}</span>
                     </div>
                     <div style={styles.metricCell}>
                       <span style={styles.metricLabel}>Runway</span>
-                      <span style={styles.metricValue}>{runway || '—'}</span>
+                      <span style={styles.metricValue}>{m?.runway || '—'}</span>
                     </div>
                   </div>
                 );
