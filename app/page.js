@@ -27,12 +27,6 @@ function getNextWednesday(lastDateStr) {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-function getCompanyStatus(notes, prevNotes) {
-  if (notes && notes.trim()) return 'green';
-  if (prevNotes && prevNotes.trim()) return 'amber';
-  return 'red';
-}
-
 // ── State Reducer ──────────────────────────────────────────────────
 function appReducer(state, action) {
   switch (action.type) {
@@ -280,8 +274,17 @@ export default function MeetingPage() {
   const [generalNotesOpen, setGeneralNotesOpen] = useState(true);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [portfolioMetrics, setPortfolioMetrics] = useState({ byName: {} });
   const noteRef = useRef(null);
   const companyListRef = useRef(null);
+
+  // Fetch portfolio metrics (ARR / growth / runway) from the Portfolio DB
+  useEffect(() => {
+    fetch('/api/portfolio')
+      .then((r) => r.ok ? r.json() : { byName: {} })
+      .then((data) => setPortfolioMetrics(data || { byName: {} }))
+      .catch(() => setPortfolioMetrics({ byName: {} }));
+  }, []);
 
   // Load live data from Google Sheets on mount
   useEffect(() => {
@@ -654,10 +657,6 @@ export default function MeetingPage() {
           <div style={styles.companyList} ref={companyListRef}>
             {filteredCompanies.map((company, filteredIdx) => {
               const realIdx = companies.indexOf(company);
-              const status = getCompanyStatus(
-                currentNotes[company.name],
-                prevNotes[company.name]
-              );
               const isSelected = realIdx === selectedCompany;
               const preview = currentNotes[company.name] || '';
 
@@ -674,7 +673,6 @@ export default function MeetingPage() {
                     <span style={styles.companyIndex}>
                       {String(realIdx + 1).padStart(2, '0')}
                     </span>
-                    <div className={`status-dot ${status}`} />
                     <span style={styles.companyName}>{company.name}</span>
                   </div>
                   <div style={styles.companyMeta}>
@@ -733,6 +731,32 @@ export default function MeetingPage() {
                   placeholder="e.g. $2.5M"
                 />
               </div>
+
+              {/* Metrics from Portfolio DB */}
+              {(() => {
+                const key = (selectedCo.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const m = portfolioMetrics.byName?.[key];
+                const arr = m?.arr || '';
+                const growth = m?.growth || '';
+                const runway = m?.runway || '';
+                if (!arr && !growth && !runway) return null;
+                return (
+                  <div style={styles.metricsRow}>
+                    <div style={styles.metricCell}>
+                      <span style={styles.metricLabel}>ARR</span>
+                      <span style={styles.metricValue}>{arr || '—'}</span>
+                    </div>
+                    <div style={styles.metricCell}>
+                      <span style={styles.metricLabel}>Growth</span>
+                      <span style={styles.metricValue}>{growth || '—'}</span>
+                    </div>
+                    <div style={styles.metricCell}>
+                      <span style={styles.metricLabel}>Runway</span>
+                      <span style={styles.metricValue}>{runway || '—'}</span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* This week's notes */}
               <div style={{ marginTop: '24px' }}>
@@ -1167,6 +1191,34 @@ const styles = {
     color: 'var(--cream-40)',
     lineHeight: '1.6',
     background: 'var(--cream-04)',
+  },
+  metricsRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '1px',
+    marginTop: '20px',
+    background: 'var(--cream-12)',
+    border: '1px solid var(--cream-12)',
+  },
+  metricCell: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: '12px 14px',
+    background: 'var(--surface-2)',
+  },
+  metricLabel: {
+    fontSize: '10px',
+    fontWeight: 500,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: 'var(--cream-40)',
+  },
+  metricValue: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: 'var(--cream)',
+    letterSpacing: '-0.3px',
   },
   historyToggle: {
     display: 'flex',
