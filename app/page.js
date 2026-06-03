@@ -3,7 +3,7 @@
 import { useState, useReducer, useEffect, useCallback, useRef } from 'react';
 import {
   Search, Plus, User, Users, Clock, ChevronRight, ChevronDown,
-  Save, Loader2, Check, X, Copy, CalendarPlus, AlertCircle,
+  Save, Loader2, Check, X, Copy, CalendarPlus, AlertCircle, RefreshCw,
 } from 'lucide-react';
 import { TEAM_MEMBERS, LOGO_MAP } from '@/lib/mockData';
 import { parseActionItems, groupActionsByOwner, formatForSlack } from '@/lib/actionParser';
@@ -269,91 +269,9 @@ export default function MeetingPage() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [portfolioMetrics, setPortfolioMetrics] = useState({ byName: {} });
+  const [reverseSyncing, setReverseSyncing] = useState(false);
   const noteRef = useRef(null);
   const companyListRef = useRef(null);
-
-  // Fetch portfolio metrics (ARR / growth / runway) from the Portfolio DB
-  useEffect(() => {
-    fetch('/api/portfolio')
-      .then((r) => r.ok ? r.json() : { byName: {} })
-      .then((data) => setPortfolioMetrics(data || { byName: {} }))
-      .catch(() => setPortfolioMetrics({ byName: {} }));
-  }, []);
-
-  // Load live data from Google Sheets on mount
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const res = await fetch('/api/sheet');
-        if (!res.ok) throw new Error('Failed to fetch sheet data');
-        const data = await res.json();
-
-        let { companies, dates, notes, generalNotes, actionItems } = data;
-
-        // Auto-generate new Wednesday if needed
-        if (dates.length > 0) {
-          const lastDate = dates[dates.length - 1];
-          const nextWed = getNextWednesday(lastDate);
-          const now = new Date();
-          const parts = nextWed.split('/');
-          const nextWedDate = new Date(now.getFullYear(), parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
-          // If today is on or after that Wednesday and it doesn't exist yet
-          if (now >= nextWedDate && !dates.includes(nextWed)) {
-            dates = [...dates, nextWed];
-            notes = { ...notes, [nextWed]: {} };
-            generalNotes = { ...generalNotes, [nextWed]: '' };
-          }
-        }
-
-        const activeDate = dates[dates.length - 1] || '';
-
-        // Parse existing action items text from sheet (row 4) if present
-        let parsedActions = [];
-        const aiText = actionItems?.[activeDate];
-        if (aiText && typeof aiText === 'string' && aiText.trim()) {
-          // We have raw text from row 4 — display it as-is via the banner
-          // Re-parse from notes instead for structured data
-          for (const company of companies) {
-            const note = notes[activeDate]?.[company.name];
-            if (note) {
-              const items = parseActionItems(note, company.name);
-              parsedActions.push(...items);
-            }
-          }
-        }
-
-        dispatch({
-          type: 'LOAD_DATA',
-          payload: {
-            companies,
-            dates,
-            notes,
-            generalNotes,
-            actionItems: parsedActions,
-            activeDate,
-            selectedCompany: 0,
-            showActionItems: parsedActions.length > 0,
-          },
-        });
-      } catch (err) {
-        console.error('Failed to load sheet data:', err);
-        addToast('Failed to load data from Google Sheets', 'error');
-        dispatch({
-          type: 'LOAD_DATA',
-          payload: {
-            companies: [],
-            dates: [],
-            notes: {},
-            generalNotes: {},
-            actionItems: [],
-            activeDate: '',
-            selectedCompany: 0,
-          },
-        });
-      }
-    }
-    loadData();
-  }, []);
 
   const addToast = useCallback((message, type = 'success') => {
     const id = Date.now();
@@ -363,6 +281,92 @@ export default function MeetingPage() {
   const removeToast = useCallback((id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  // Fetch portfolio metrics (ARR / growth / runway) from the Portfolio DB
+  useEffect(() => {
+    fetch('/api/portfolio')
+      .then((r) => r.ok ? r.json() : { byName: {} })
+      .then((data) => setPortfolioMetrics(data || { byName: {} }))
+      .catch(() => setPortfolioMetrics({ byName: {} }));
+  }, []);
+
+  // Pull the current Google Sheet state into the app. The sheet is the source
+  // of truth: on success this replaces all local state with the sheet content.
+  // Used both on mount and by the manual "Reverse Sync" button.
+  const loadFromSheet = useCallback(async () => {
+    const res = await fetch('/api/sheet');
+    if (!res.ok) {
+      const detail = await res.json().catch(() => ({}));
+      throw new Error(detail.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+
+    let { companies, dates, notes, generalNotes, actionItems } = data;
+
+    // Auto-generate new Wednesday if needed
+    if (dates.length > 0) {
+      const lastDate = dates[dates.length - 1];
+      const nextWed = getNextWednesday(lastDate);
+      const now = new Date();
+      const parts = nextWed.split('/');
+      const nextWedDate = new Date(now.getFullYear(), parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
+      // If today is on or after that Wednesday and it doesn't exist yet
+      if (now >= nextWedDate && !dates.includes(nextWed)) {
+        dates = [...dates, nextWed];
+        notes = { ...notes, [nextWed]: {} };
+        generalNotes = { ...generalNotes, [nextWed]: '' };
+      }
+    }
+
+    const activeDate = dates[dates.length - 1] || '';
+
+    // Parse existing action items from notes for the active date
+    const parsedActions = [];
+    const aiText = actionItems?.[activeDate];
+    if (aiText && typeof aiText === 'string' && aiText.trim()) {
+      for (const company of companies) {
+        const note = notes[activeDate]?.[company.name];
+        if (note) {
+          parsedActions.push(...parseActionItems(note, company.name));
+        }
+      }
+    }
+
+    dispatch({
+      type: 'LOAD_DATA',
+      payload: {
+        companies,
+        dates,
+        notes,
+        generalNotes,
+        actionItems: parsedActions,
+        activeDate,
+        selectedCompany: 0,
+        showActionItems: parsedActions.length > 0,
+        dirty: false,
+      },
+    });
+  }, []);
+
+  // Load live data from Google Sheets on mount
+  useEffect(() => {
+    loadFromSheet().catch((err) => {
+      console.error('Failed to load sheet data:', err);
+      addToast('Failed to load data from Google Sheets', 'error');
+      dispatch({
+        type: 'LOAD_DATA',
+        payload: {
+          companies: [],
+          dates: [],
+          notes: {},
+          generalNotes: {},
+          actionItems: [],
+          activeDate: '',
+          selectedCompany: 0,
+        },
+      });
+    });
+  }, [loadFromSheet, addToast]);
 
   // Derived data
   const {
@@ -447,6 +451,29 @@ export default function MeetingPage() {
     setTimeout(() => {
       dispatch({ type: 'SET_SAVING', saveState: 'idle' });
     }, 2000);
+  }
+
+  // ── Reverse Sync handler ──────────────────────────────
+  // Google Sheets is the source of truth: discard local state and reload
+  // everything from the sheet.
+  async function handleReverseSync() {
+    if (reverseSyncing) return;
+    if (state.dirty) {
+      const ok = window.confirm(
+        'Reverse Sync pulls the latest from Google Sheets and discards unsaved local changes. Continue?'
+      );
+      if (!ok) return;
+    }
+    setReverseSyncing(true);
+    try {
+      await loadFromSheet();
+      addToast('Synced from Google Sheets');
+    } catch (err) {
+      console.error('Reverse sync error:', err);
+      addToast(`Reverse sync failed: ${err.message}`, 'error');
+    } finally {
+      setReverseSyncing(false);
+    }
   }
 
   // ── New Week handler ──────────────────────────────────
@@ -569,9 +596,23 @@ export default function MeetingPage() {
           </div>
 
           <button
+            className="btn btn-ghost"
+            onClick={handleReverseSync}
+            disabled={reverseSyncing || saveState === 'saving'}
+            style={{ padding: '7px 14px' }}
+            title="Pull the latest from Google Sheets (sheet is source of truth). Discards unsaved local changes."
+          >
+            {reverseSyncing ? (
+              <><Loader2 size={14} className="spinner" /> Syncing...</>
+            ) : (
+              <><RefreshCw size={14} /> Reverse Sync</>
+            )}
+          </button>
+
+          <button
             className={`btn ${saveState === 'success' ? 'btn-success' : 'btn-primary'}`}
             onClick={handleSave}
-            disabled={saveState === 'saving'}
+            disabled={saveState === 'saving' || reverseSyncing}
             style={{ padding: '7px 16px' }}
           >
             {saveState === 'saving' ? (
