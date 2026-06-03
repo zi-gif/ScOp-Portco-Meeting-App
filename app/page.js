@@ -424,7 +424,14 @@ export default function MeetingPage() {
         }),
       });
 
-      if (!res.ok) throw new Error('Sync failed');
+      if (!res.ok) {
+        // Read the structured error the server now returns so the console is actionable.
+        const detail = await res.json().catch(() => ({}));
+        console.error('Save failed:', res.status, detail);
+        const reason =
+          detail.hint || detail.message || `HTTP ${res.status}`;
+        throw new Error(reason);
+      }
 
       dispatch({ type: 'SET_ACTION_ITEMS', items: allActions });
       dispatch({ type: 'SET_SAVING', saveState: 'success' });
@@ -433,7 +440,7 @@ export default function MeetingPage() {
     } catch (err) {
       console.error('Save error:', err);
       dispatch({ type: 'SET_SAVING', saveState: 'idle' });
-      addToast('Failed to save — check console for details', 'error');
+      addToast(`Failed to save: ${err.message}`, 'error');
       return;
     }
 
