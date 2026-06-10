@@ -9,6 +9,23 @@ import { TEAM_MEMBERS, LOGO_MAP } from '@/lib/mockData';
 import { parseActionItems, groupActionsByOwner, formatForSlack } from '@/lib/actionParser';
 
 // ── Helpers ─────────────────────────────────────────────────────────
+// The app is a long-lived SPA behind a 30-day session cookie (scop_auth).
+// Once the tab is open the HTML never re-validates, so a lapsed session
+// (cookie expired, cleared, or APP_PASSWORD set on Vercel after the tab
+// was opened) only shows up when an API call hits middleware and 401s.
+// Send the user back to /login to re-auth instead of surfacing a dead-end
+// "HTTP 401" toast. Returns the response when not a 401 so callers proceed.
+async function authedFetch(input, init) {
+  const res = await fetch(input, init);
+  if (res.status === 401) {
+    window.location.href = '/login';
+    // Resolve to a never-fulfilling promise so the caller's success path
+    // doesn't run while the browser is navigating away.
+    await new Promise(() => {});
+  }
+  return res;
+}
+
 function getNextWednesday(lastDateStr) {
   // Parse "M/D" date string relative to current year
   const now = new Date();
@@ -284,7 +301,7 @@ export default function MeetingPage() {
 
   // Fetch portfolio metrics (ARR / growth / runway) from the Portfolio DB
   useEffect(() => {
-    fetch('/api/portfolio')
+    authedFetch('/api/portfolio')
       .then((r) => r.ok ? r.json() : { byName: {} })
       .then((data) => setPortfolioMetrics(data || { byName: {} }))
       .catch(() => setPortfolioMetrics({ byName: {} }));
@@ -294,7 +311,7 @@ export default function MeetingPage() {
   // of truth: on success this replaces all local state with the sheet content.
   // Used both on mount and by the manual "Reverse Sync" button.
   const loadFromSheet = useCallback(async () => {
-    const res = await fetch('/api/sheet');
+    const res = await authedFetch('/api/sheet');
     if (!res.ok) {
       const detail = await res.json().catch(() => ({}));
       throw new Error(detail.message || `HTTP ${res.status}`);
@@ -416,7 +433,7 @@ export default function MeetingPage() {
       const actionItemsText = formatForSlack(grouped);
 
       // Sync to Google Sheets
-      const res = await fetch('/api/sheet/sync', {
+      const res = await authedFetch('/api/sheet/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -489,7 +506,7 @@ export default function MeetingPage() {
     dispatch({ type: 'ADD_COMPANY', company });
 
     try {
-      const res = await fetch('/api/sheet/add-company', {
+      const res = await authedFetch('/api/sheet/add-company', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(company),
